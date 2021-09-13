@@ -2,6 +2,7 @@ from flask import render_template, url_for
 from flask import request
 from app import app, db
 from app.models import User
+import json
 
 
 @app.route('/', methods=['GET'])
@@ -18,13 +19,15 @@ def focus_app():
         return render_template('focus.html', ids=l)
     elif request.method == 'POST':
         # store posted data in python database
-        u = User(userid=request.form.get('userid'), token=request.form.get('token'))
+        userid = request.form.get("userid")
+        token = request.form.get("token")
+        u = User(userid=userid, token=token)
         db.session.add(u)
         db.session.commit()
-        l = [u.userid for u in User.query.all()]
-        return render_template('focus.html', ids=l)
+        return json.dumps({"userid": userid, "token": token})
     else:
         print('Other method??')
+        return "Method not supported"
 
 
 @app.route('/focus_send_notif')
